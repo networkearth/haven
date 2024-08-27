@@ -5,5 +5,10 @@ Tools for open source data collaboration
 
 ```bash
 nvm install 22
-pip install .`
+pip install .
+aws configure
 ```
+
+## ToDo
+
+- [ ] Consolidate CDK configuration

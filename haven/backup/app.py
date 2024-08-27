@@ -8,11 +8,11 @@ from aws_cdk import (
 from constructs import Construct
 
 
-class DatabaseStack(Stack):
+class BackupStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        bucket_name = f'{id}-bucket'
+        bucket_name = f'{id}-backup'
         bucket = s3.Bucket(
             self, bucket_name, bucket_name=bucket_name,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
@@ -21,11 +21,11 @@ class DatabaseStack(Stack):
         )
 
 
-def database_app(branch: str):
+def backup_app():
     app = App()
     config = app.node.try_get_context('config')
     environment = Environment(account=config['account'], region=config['region'])
 
-    stack = DatabaseStack(app, branch + '-' + config['database'], env=environment)
+    stack = BackupStack(app, config['database'], env=environment)
 
     app.synth()
