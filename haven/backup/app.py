@@ -12,7 +12,7 @@ class BackupStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        bucket_name = f'{id}-backup'
+        bucket_name = id
         bucket = s3.Bucket(
             self, bucket_name, bucket_name=bucket_name,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
@@ -26,6 +26,7 @@ def backup_app():
     config = app.node.try_get_context('config')
     environment = Environment(account=config['account'], region=config['region'])
 
-    stack = BackupStack(app, config['database'], env=environment)
+    stack_name = (config['database'] + '_backup').replace('_', '-')
+    stack = BackupStack(app, stack_name, env=environment)
 
     app.synth()

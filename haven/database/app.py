@@ -12,7 +12,7 @@ class DatabaseStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        bucket_name = f'{id}-bucket'
+        bucket_name = id
         bucket = s3.Bucket(
             self, bucket_name, bucket_name=bucket_name,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
@@ -26,6 +26,7 @@ def database_app(branch: str):
     config = app.node.try_get_context('config')
     environment = Environment(account=config['account'], region=config['region'])
 
-    stack = DatabaseStack(app, branch + '-' + config['database'], env=environment)
+    stack_name = (branch + '_' + config['database'] + '_database').replace('_', '-')
+    stack = DatabaseStack(app, stack_name, env=environment)
 
     app.synth()

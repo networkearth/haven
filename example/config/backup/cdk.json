@@ -4,7 +4,7 @@
         "config": {
             "account": "575101084097",
             "region": "us-east-1",
-            "database": "example-haven"
+            "database": "example_haven"
         }
     }
 }
