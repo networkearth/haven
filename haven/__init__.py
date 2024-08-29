@@ -3,6 +3,7 @@ import click
 
 from haven.database.app import database_app 
 from haven.backup.app import backup_app
+from haven.control import determine_new_data, backup_new_data
 
 
 @click.group()
@@ -16,6 +17,19 @@ def setup():
 @cli.command()
 def teardown():
     print("Tearing down Haven")
+
+@cli.command()
+@click.argument('path')
+def add(path):
+    os.system(f'git add {path}')
+
+@cli.command()
+@click.option('--message', '-m', required=True)
+def commit(message):
+    new_data = determine_new_data()
+    backup_new_data(new_data)
+    os.system(f'git commit -m "{message}"')
+
 
 @click.group()
 def build_cli():

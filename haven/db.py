@@ -35,6 +35,10 @@ def build_path(table):
     haven_name = os.environ['HAVEN_NAME']
     return f's3://{haven_name}-database/{table}/'.replace('_', '-')
 
+def get_bucket():
+    haven_name = os.environ['HAVEN_NAME']
+    return f'{haven_name}-database'.replace('_', '-')
+
 
 def validate_against_schema(df, table, partition_cols):
     haven_name = os.environ['HAVEN_NAME']

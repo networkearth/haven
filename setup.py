@@ -12,6 +12,7 @@ setup(
         'aws-cdk-lib==2.154.1',
         'awswrangler==3.9.1',
         'pyyaml==6.0.2',
+        'pygit2==1.15.1',
     ],
     entry_points={
         'console_scripts': [

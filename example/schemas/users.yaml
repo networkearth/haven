@@ -1,6 +1,0 @@
-columns:
-  age: bigint
-partition_columns:
-  name: string
-partition_order:
-- name
