@@ -3,7 +3,7 @@ import click
 import yaml
 import json
 
-from haven.control import determine_new_data, backup_new_data
+from haven.db import create_database
 
 def setup_stack(config):
     # start by creating the database directory
@@ -54,3 +54,6 @@ def init(config_path):
     os.chdir(config['database'])
     os.system('cdk deploy')
     os.chdir(cwd)
+
+    # now setup the database in glue
+    create_database(config['database'])

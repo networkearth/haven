@@ -21,7 +21,8 @@ pip install .
 Setting up your database is easy as pie! 
 
 1. Configure the [AWS CLI](https://aws.amazon.com/cli/) to act as a user with cloudformation access. (It's best if you work with an account admin)
-2. Fill out the configuration file `config.yaml`:
+2. Ensure you have a recent enough version of `node` - `nvm install 22`
+3. Fill out the configuration file `config.yaml`:
 
 ```yaml
 database: my_database
@@ -29,7 +30,7 @@ account: '575101084097'
 region: 'us-east-1'
 ```
 
-3. Run `haven init config.yaml`
+4. Run `haven init config.yaml`
 
 In addition to setting up your directory haven will build a directory with the name of your database that includes all of the cloud formation configuration and templates that were used to build your database in case you want to check on anything. 
 

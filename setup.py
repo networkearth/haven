@@ -15,7 +15,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'haven = haven.__init__:cli'
+            'haven = haven.cli:cli'
         ]
     }
 )
