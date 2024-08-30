@@ -8,7 +8,7 @@ from aws_cdk import (
 from constructs import Construct
 
 
-class BackupStack(Stack):
+class DatabaseStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
@@ -21,12 +21,16 @@ class BackupStack(Stack):
         )
 
 
-def backup_app():
+def database_app():
     app = App()
     config = app.node.try_get_context('config')
     environment = Environment(account=config['account'], region=config['region'])
 
-    stack_name = (config['database'] + '_backup').replace('_', '-')
-    stack = BackupStack(app, stack_name, env=environment)
+    stack_name = (config['database'] + '-database').replace('_', '-')
+    stack = DatabaseStack(app, stack_name, env=environment)
 
     app.synth()
+
+
+if __name__ == '__main__':
+    database_app()
