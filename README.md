@@ -34,4 +34,52 @@ region: 'us-east-1'
 
 In addition to setting up your directory haven will build a directory with the name of your database that includes all of the cloud formation configuration and templates that were used to build your database in case you want to check on anything. 
 
+## Interacting with Your Database
+
+1. Setup your environment:
+
+```python
+import os
+import haven.db as db
+os.environ['HAVEN_DATABASE'] = 'my_database'
+```
+
+2. Write some data:
+
+```python
+import pandas as pd
+data = pd.DataFrame([
+    {'name': 'Alice', 'age': 25, 'city': 'New York'},
+    {'name': 'Bob', 'age': 30, 'city': 'New York'},
+    {'name': 'Charlie', 'age': 35, 'city': 'Boston'},
+    {'name': 'David', 'age': 40, 'city': 'Boston'},
+])
+
+db.write_data(data, 'people', ['city'])
+```
+
+The second argument is the table you want to write to. (It will be created if this is the first time you are writing to it)
+
+The third argument is the set of columns you want to partition the data on. (Think of it like an index)
+
+3. Query some data:
+
+```python
+db.read_data('select * from people')
+```
+
+4. Delete some data:
+
+```python
+db.delete_data('people', [{'city': 'New York'}])
+```
+
+5. Drop a table:
+
+```python
+db.drop_table('people')
+```
+
+
+
 
