@@ -70,7 +70,7 @@ def write_data(df, table, partition_cols, database):
     :type database: str
     """
     if wr.catalog.does_table_exist(database=database, table=table):
-        validate_against_schema(df, table, partition_cols, database)
+        validate_against_schema(df, table, partition_cols, database, spark=True)
     else:
         dtypes = {col: _type for col, _type in df.dtypes}
         wr.catalog.create_parquet_table(
