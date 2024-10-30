@@ -8,10 +8,15 @@ from .db import build_path, validate_against_schema
 
 # https://medium.com/@afsalopes/how-query-aws-athena-with-pyspark-894b667ba335
 
-def configure(spark_session, region, hadoop_version="3.3.4"):
+def configure(spark_session, region="", hadoop_version="3.3.4"):
     """
     :param spark_session: The SparkSession to configure.
     :type spark_session: pyspark.sql.SparkSession
+    :param region: The AWS region. If not provided, will use the value of the 
+        AWS_REGION environment variable.
+    :type region: str
+    :param hadoop_version: The version of Hadoop to match. Default is 3.3.4.
+    :type hadoop_version: str
     :return: The configured SparkSession.
     :rtype: pyspark.sql.SparkSession
 
@@ -26,6 +31,8 @@ def configure(spark_session, region, hadoop_version="3.3.4"):
     To find your hadoop version, run the following command in your pyspark shell:
     sc._gateway.jvm.org.apache.hadoop.util.VersionInfo.getVersion()
     """
+    region = region or os.environ["AWS_REGION"]
+
     return (
         spark_session
         .config("spark.jars.packages", f"org.apache.hadoop:hadoop-aws:{hadoop_version}")
@@ -33,28 +40,31 @@ def configure(spark_session, region, hadoop_version="3.3.4"):
         .config("spark.jars","https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
         .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
         .config("spark.hadoop.fs.s3a.endpoint", f"s3.{region}.amazonaws.com")
-        .config("spark.sql.sources.partitionOverwriteMode", "DYNAMIC")
+        .config("spark.sql.sources.partitionOverwriteMode", "DYNAMIC") # overwrite only the partitions that have changed
     )
 
-def read_data(sql, spark, account, region):
+def read_data(sql, spark, query_results_bucket, region=""):
     """
     :param sql: The SQL query to run.
     :type sql: str
     :param spark: The SparkSession to use.
     :type spark: pyspark.sql.SparkSession
-    :param account: The AWS account ID.
-    :type account: str
-    :param region: The AWS region.
+    :param query_results_bucket: The S3 bucket to store the query results.
+    :type query_results_bucket: str
+    :param region: The AWS region. If not provided, will use the value of the
+        AWS_REGION environment variable.
     :type region: str
     :return: The DataFrame resulting from the query.
     :rtype: pyspark.sql.DataFrame
     """
+    region = region or os.environ["AWS_REGION"]
+
     return (
         spark.read.format("jdbc")
             .option("driver", "com.simba.athena.jdbc.Driver")
             .option("url", f"jdbc:awsathena://athena.{region}.amazonaws.com:443")
             .option("AwsCredentialsProviderClass", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
-            .option("S3OutputLocation", f"s3://aws-athena-query-results-{account}-{region}")
+            .option("S3OutputLocation", query_results_bucket)
             .option("query", sql)
             .load()
     )
