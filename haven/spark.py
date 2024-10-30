@@ -9,6 +9,7 @@ from .db import build_path, validate_against_schema
 
 # https://medium.com/@afsalopes/how-query-aws-athena-with-pyspark-894b667ba335
 
+# pylint: disable=line-too-long
 def configure(spark_session, region="", hadoop_version="3.3.4"):
     """
     :param spark_session: The SparkSession to configure.
@@ -87,7 +88,7 @@ def write_data(df, table, partition_cols, database=""):
     if wr.catalog.does_table_exist(database=database, table=table):
         validate_against_schema(df, table, partition_cols, database, spark=True)
     else:
-        dtypes = {col: _type for col, _type in df.dtypes}
+        dtypes = dict(df.dtypes)
         wr.catalog.create_parquet_table(
             database=database,
             table=table,

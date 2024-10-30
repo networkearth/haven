@@ -59,7 +59,7 @@ def validate_against_schema(df, table, partition_cols, database="", spark=False)
             df, partition_cols=partition_cols
         )
     else:
-        dtypes = {col: _type for col, _type in df.dtypes}
+        dtypes = dict(df.dtypes)
         column_types = {col: dtypes[col] for col in dtypes if col not in partition_cols}
         partition_types = {col: dtypes[col] for col in partition_cols}
 
