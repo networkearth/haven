@@ -33,6 +33,7 @@ def configure(spark_session, region, hadoop_version="3.3.4"):
         .config("spark.jars","https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
         .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
         .config("spark.hadoop.fs.s3a.endpoint", f"s3.{region}.amazonaws.com")
+        .config("spark.sql.sources.partitionOverwriteMode", "DYNAMIC")
     )
 
 def read_data(sql, spark, account, region):
