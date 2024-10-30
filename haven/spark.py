@@ -8,7 +8,7 @@ from .db import build_path, validate_against_schema
 
 # https://medium.com/@afsalopes/how-query-aws-athena-with-pyspark-894b667ba335
 
-def configure(spark_session, hadoop_version="3.3.4"):
+def configure(spark_session, region, hadoop_version="3.3.4"):
     """
     :param spark_session: The SparkSession to configure.
     :type spark_session: pyspark.sql.SparkSession
@@ -31,6 +31,8 @@ def configure(spark_session, hadoop_version="3.3.4"):
         .config("spark.jars.packages", f"org.apache.hadoop:hadoop-aws:{hadoop_version}")
         .config("spark.hadoop.mapreduce.fileoutputcommitter.marksuccessfuljobs", "false") # prevents writing _SUCCESS files
         .config("spark.jars","https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
+        .config("spark.hadoop.fs.s3a.endpoint", f"s3.{region}.amazonaws.com")
     )
 
 def read_data(sql, spark, account, region):
