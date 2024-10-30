@@ -8,7 +8,6 @@ setup(
     packages=find_packages(include=['haven', 'haven*']),
     install_requires=[
         'click==8.1.7',
-        'pylint==3.2.6',
         'aws-cdk-lib==2.154.1',
         'awswrangler==3.9.1',
         'pyyaml==6.0.2',
