@@ -29,7 +29,7 @@ def build_path(table, database=""):
     return f"s3://{database}-database/{table}/".replace("_", "-")
 
 
-def validate_against_schema(df, table, partition_cols, database=""):
+def validate_against_schema(df, table, partition_cols, database="", spark=False):
     """
     :param df: The DataFrame to validate.
     :type df: pandas.DataFrame
@@ -40,6 +40,8 @@ def validate_against_schema(df, table, partition_cols, database=""):
     :param database: The name of the database. If not provided,
         will use the value of the HAVEN_DATABASE environment variable.
     :type database: str
+    :param spark: Whether we are validating a Spark DataFrame.
+    :type spark: bool
     """
     database = database or os.environ["HAVEN_DATABASE"]
 
@@ -52,9 +54,14 @@ def validate_against_schema(df, table, partition_cols, database=""):
         else:
             expected_column_types[row["Column Name"]] = row["Type"]
 
-    column_types, partition_types = wr.catalog.extract_athena_types(
-        df, partition_cols=partition_cols
-    )
+    if not spark:
+        column_types, partition_types = wr.catalog.extract_athena_types(
+            df, partition_cols=partition_cols
+        )
+    else:
+        dtypes = {col: _type for col, _type in df.dtypes}
+        column_types = {col: dtypes[col] for col in dtypes if col not in partition_cols}
+        partition_types = {col: dtypes[col] for col in partition_cols}
 
     assert (
         column_types == expected_column_types
