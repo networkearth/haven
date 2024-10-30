@@ -58,7 +58,7 @@ def read_data(sql, spark, account, region):
             .load()
     )
 
-def write_data(df, table, partition_cols, database):
+def write_data(df, table, partition_cols, database=""):
     """
     :param df: The DataFrame to write.
     :type df: pyspark.sql.DataFrame
