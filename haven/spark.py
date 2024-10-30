@@ -2,6 +2,7 @@
 Functions for interacting with your Haven database with spark.
 """
 
+import os
 import awswrangler as wr
 
 from .db import build_path, validate_against_schema
