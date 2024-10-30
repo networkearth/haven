@@ -71,6 +71,16 @@ def write_data(df, table, partition_cols, database):
     """
     if wr.catalog.does_table_exist(database=database, table=table):
         validate_against_schema(df, table, partition_cols, database)
+    else:
+        dtypes = {col: _type for col, _type in df.dtypes}
+        wr.catalog.create_parquet_table(
+            database=database,
+            table=table,
+            path=build_path(table, database),
+            compression='snappy',
+            columns_types={col: _type for col, _type in dtypes.items() if col not in partition_cols},
+            partition_cols_types={col: dtypes[col] for col in partition_cols}
+        )
 
     path = build_path(table, database).replace('s3', 's3a')
 
