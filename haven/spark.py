@@ -66,9 +66,12 @@ def write_data(df, table, partition_cols, database):
     :type table: str
     :param partition_cols: The partition columns.
     :type partition_cols: list
-    :param database: The name of the database.
+    :param database: The name of the database. If not provided,
+        will use the value of the HAVEN_DATABASE environment variable.
     :type database: str
     """
+    database = database or os.environ["HAVEN_DATABASE"]
+
     if wr.catalog.does_table_exist(database=database, table=table):
         validate_against_schema(df, table, partition_cols, database, spark=True)
     else:
