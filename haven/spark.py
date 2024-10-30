@@ -85,3 +85,9 @@ def write_data(df, table, partition_cols, database):
     path = build_path(table, database).replace('s3', 's3a')
 
     df.write.mode("overwrite").partitionBy(*partition_cols).parquet(path)
+
+    # register the partitions
+    wr.athena.repair_table(
+        table=table,
+        database=database
+    )
