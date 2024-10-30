@@ -31,7 +31,7 @@ def configure(spark_session, hadoop_version="3.3.4"):
         .config("spark.jars","https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
     )
 
-def read_data(sql, spark, account, region)
+def read_data(sql, spark, account, region):
     """
     :param sql: The SQL query to run.
     :type sql: str
