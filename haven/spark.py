@@ -6,7 +6,7 @@ import awswrangler as wr
 
 from .db import build_path, validate_against_schema
 
-def configure(spark_session):
+def configure(spark_session, hadoop_version="3.3.4"):
     """
     :param spark_session: The SparkSession to configure.
     :type spark_session: pyspark.sql.SparkSession
@@ -20,10 +20,13 @@ def configure(spark_session):
     spark_session = SparkSession.builder
     spark_session = configure(spark_session)
     spark = spark_session.config(...).getOrCreate()
+
+    To find your hadoop version, run the following command in your pyspark shell:
+    sc._gateway.jvm.org.apache.hadoop.util.VersionInfo.getVersion()
     """
     return (
         spark_session
-        .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.4")
+        .config("spark.jars.packages", f"org.apache.hadoop:hadoop-aws:{hadoop_version}")
         .config("spark.hadoop.mapreduce.fileoutputcommitter.marksuccessfuljobs", "false") # prevents writing _SUCCESS files
         .config("spark.jars","https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
     )
