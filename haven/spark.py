@@ -6,6 +6,8 @@ import awswrangler as wr
 
 from .db import build_path, validate_against_schema
 
+# https://medium.com/@afsalopes/how-query-aws-athena-with-pyspark-894b667ba335
+
 def configure(spark_session, hadoop_version="3.3.4"):
     """
     :param spark_session: The SparkSession to configure.
@@ -68,6 +70,6 @@ def write_data(df, table, partition_cols, database):
     if wr.catalog.does_table_exist(database=database, table=table):
         validate_against_schema(df, table, partition_cols, database)
 
-    path = build_path(table, database)
+    path = build_path(table, database).replace('s3', 's3a')
 
     df.write.mode("overwrite").partitionBy(*partition_cols).parquet(path)
