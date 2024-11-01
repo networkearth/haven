@@ -81,7 +81,7 @@ def read_data(sql, spark, query_results_bucket, region=""):
             .option("driver", "com.simba.athena.jdbc.Driver")
             .option("url", f"jdbc:awsathena://athena.{region}.amazonaws.com:443")
             #.option("AwsCredentialsProviderClass", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
-            .option("CredentialsProvider", "DefaultChain")
+            .option("AwsCredentialsProviderClass", "InstanceProfile")
             .option("S3OutputLocation", query_results_bucket)
             .option("query", sql)
             .load()
