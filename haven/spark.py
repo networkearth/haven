@@ -9,6 +9,7 @@ import urllib.request
 from .db import build_path, validate_against_schema
 
 # https://medium.com/@afsalopes/how-query-aws-athena-with-pyspark-894b667ba335
+# https://repost.aws/questions/QUV7zwvwFJTlqi1PqX8hmZFg/classnotfoundexception-emrfilesystem-error-while-setting-spark-driver-class-path-config-in-emr-serverless
 
 # pylint: disable=line-too-long
 def configure(spark_session, region="", hadoop_version="3.3.4"):
@@ -49,7 +50,7 @@ def configure(spark_session, region="", hadoop_version="3.3.4"):
         .config("spark.hadoop.fs.s3a.endpoint", f"s3.amazonaws.com")
         #.config("spark.files", "https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
         #.config("spark.jars", "./AthenaJDBC42-2.0.33.jar")
-        .config("spark.jars", "https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
+        .config("spark.jars", "https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar") # not the jar actually used in EMR, just for local dev
         #.config("spark.driver.extraClassPath", "./AthenaJDBC42-2.0.33.jar")
         #.config("spark.executor.extraClassPath", "./AthenaJDBC42-2.0.33.jar")
         #.config("spark.jars", "s3a://mirrorverse-emr/jars/AthenaJDBC42-2.0.33.jar")
@@ -79,7 +80,8 @@ def read_data(sql, spark, query_results_bucket, region=""):
         spark.read.format("jdbc")
             .option("driver", "com.simba.athena.jdbc.Driver")
             .option("url", f"jdbc:awsathena://athena.{region}.amazonaws.com:443")
-            .option("AwsCredentialsProviderClass", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
+            #.option("AwsCredentialsProviderClass", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
+            .option("AwsCredentialsProviderClass", "com.amazonaws.auth.profile.InstanceProfileCredentialsProvider")
             .option("S3OutputLocation", query_results_bucket)
             .option("query", sql)
             .load()
