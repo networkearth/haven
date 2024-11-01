@@ -75,6 +75,7 @@ def read_data(sql, spark, query_results_bucket, region=""):
     :rtype: pyspark.sql.DataFrame
     """
     region = region or os.environ["AWS_REGION"]
+    print('Region:', region)
 
     return (
         spark.read.format("jdbc")
@@ -100,6 +101,7 @@ def write_data(df, table, partition_cols, database=""):
     :type database: str
     """
     database = database or os.environ["HAVEN_DATABASE"]
+    os.environ['AWS_REGION'] = 'us-east-1'
 
     if wr.catalog.does_table_exist(database=database, table=table):
         validate_against_schema(df, table, partition_cols, database, spark=True)
