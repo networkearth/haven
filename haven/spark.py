@@ -37,6 +37,7 @@ def configure(spark_session, region="", hadoop_version="3.3.4"):
 
     return (
         spark_session
+        .config("spark.local.dir", "./tmp/")
         .config("spark.jars.packages", f"org.apache.hadoop:hadoop-aws:{hadoop_version}")
         .config("spark.hadoop.mapreduce.fileoutputcommitter.marksuccessfuljobs", "false") # prevents writing _SUCCESS files
         .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
