@@ -40,7 +40,7 @@ def configure(spark_session, region="", hadoop_version="3.3.4"):
         .config("spark.jars.packages", f"org.apache.hadoop:hadoop-aws:{hadoop_version}")
         .config("spark.hadoop.mapreduce.fileoutputcommitter.marksuccessfuljobs", "false") # prevents writing _SUCCESS files
         .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
-        .config("spark.hadoop.fs.s3a.endpoint", f"s3.{region}.amazonaws.com")
+        .config("spark.hadoop.fs.s3a.endpoint", f"s3.amazonaws.com")
         .config("spark.jars", "s3a://mirrorverse-emr/jars/AthenaJDBC42-2.0.33.jar")
         .config("spark.driver.extraClassPath", "s3a://mirrorverse-emr/jars/AthenaJDBC42-2.0.33.jar")
         .config("spark.executor.extraClassPath", "s3a://mirrorverse-emr/jars/AthenaJDBC42-2.0.33.jar")
