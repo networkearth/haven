@@ -4,6 +4,7 @@ Functions for interacting with your Haven database with spark.
 
 import os
 import awswrangler as wr
+import urllib.request
 
 from .db import build_path, validate_against_schema
 
@@ -35,7 +36,9 @@ def configure(spark_session, region="", hadoop_version="3.3.4"):
     """
     region = region or os.environ["AWS_REGION"]
 
-    os.system("wget https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar -O AthenaJDBC42-2.0.33.jar")
+    jar_url = "https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar"
+    local_jar_path = "AthenaJDBC42-2.0.33.jar"
+    urllib.request.urlretrieve(jar_url, local_jar_path)
 
     return (
         spark_session
