@@ -119,8 +119,12 @@ def write_data(df, table, partition_cols, database=""):
 
     df.write.mode("overwrite").partitionBy(*partition_cols).parquet(path)
 
+    print('hello')
+
     # register the partitions
     wr.athena.repair_table(
         table=table,
         database=database
     )
+
+    print('done')
