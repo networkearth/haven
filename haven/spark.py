@@ -46,7 +46,7 @@ def configure(spark_session, region="", hadoop_version="3.3.4"):
         #.config("spark.local.dir", "./tmp/")
         .config("spark.jars.packages", f"org.apache.hadoop:hadoop-aws:{hadoop_version}")
         .config("spark.hadoop.mapreduce.fileoutputcommitter.marksuccessfuljobs", "false") # prevents writing _SUCCESS files
-        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.DefaultAWSCredentialsProviderChain")
         .config("spark.hadoop.fs.s3a.endpoint", f"s3.amazonaws.com")
         #.config("spark.files", "https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
         #.config("spark.jars", "./AthenaJDBC42-2.0.33.jar")
@@ -101,7 +101,6 @@ def write_data(df, table, partition_cols, database=""):
     :type database: str
     """
     database = database or os.environ["HAVEN_DATABASE"]
-    os.environ['AWS_REGION'] = 'us-east-1'
 
     if wr.catalog.does_table_exist(database=database, table=table):
         validate_against_schema(df, table, partition_cols, database, spark=True)
