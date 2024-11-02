@@ -80,6 +80,85 @@ db.delete_data('people', [{'city': 'New York'}])
 db.drop_table('people')
 ```
 
+## Reading and Writing with Spark
+
+### Getting the JDBC Driver in EMR
+
+In `haven.spark` there's a line of code in the `configure` function that looks like:
+
+```python
+.config("spark.jars", "https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
+```
+
+This is responsible for pull the jdbc driver for athena in a local development environment. 
+This line is useless in EMR and instead watercycle has to point to the jar in your s3 environment. 
+(Whereas its a real pain to load from s3 locally as we'd need to setup the s3 drivers first and then
+add this driver). 
+
+What this means is that you'll need to download that jar and place it in the `jars` folder of the 
+bucket that you're using for EMR. Only then will `watercycle submit spark` work properly. 
+
+### To Be or NAT to Be...
+
+Access to `athena` queries requires public internet access and because, today, EMR serverless
+doesn't allow public subnets to be associated with your applications that means setting up a 
+NAT gateway. NAT gateways however are expensive - you pay for the 24/7 and pay for them every
+time data goes through 'em. So for our purposes a NAT gateway doesn't make sense. 
+
+This doesn't mean we're totally toasted though as we can still access `glue` and get a lot of the
+work done. Specifically we can still pull directly from S3 (just not with an `athena` query)
+and can write partitions back and check their schema's against the glue catalog. 
+
+The two things we cannot do is run `athena` queries and update the registered partitions. But the
+former is really not a requirement and the latter can be done later from a batch job or a workstation. 
+
+So in the code you'll find that those two functions require `public_internet_access=True` to work
+and I've set the default of that input to `False` for now. Hopefully in the future EMR serverless 
+will allow public subnets and thus the free internet gateways that come with them. 
+
+### Reading and Writing when `public_internet_access=True`
+
+Here's an example of how you can read and write data with Spark:
+
+```python
+import os
+
+import haven.spark as db 
+from pyspark.sql import SparkSession
+
+
+if __name__ == "__main__":
+    os.environ['AWS_REGION'] = 'us-east-1'
+    os.environ['HAVEN_DATABASE'] = 'haven'
+
+    spark = SparkSession.builder
+    spark = db.configure(spark)
+    spark = spark.getOrCreate()
+
+    qrb = f"s3://aws-athena-query-results-575101084097-us-east-1"
+    sql = """
+        select 
+            * 
+        from 
+            haven.copernicus_physics 
+        where 
+            depth_bin = 25 
+            and date in ('2021-01-01', '2021-01-02')
+    """
+    df = db.read_data(
+        sql, spark, qrb, public_internet_access=True
+    )
+
+    db.write_partitions(
+        df, 'spark_test_1', ["date"]
+    )
+    db.register_partitions(
+        'spark_test_1', public_internet_access=True
+    )
+
+    spark.stop()
+```
+
 
 
 
