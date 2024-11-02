@@ -82,6 +82,22 @@ db.drop_table('people')
 
 ## Reading and Writing with Spark
 
+### Getting the JDBC Driver in EMR
+
+In `haven.spark` there's a line of code in the `configure` function that looks like:
+
+```python
+.config("spark.jars", "https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC-2.0.33.1003/AthenaJDBC42-2.0.33.jar")
+```
+
+This is responsible for pull the jdbc driver for athena in a local development environment. 
+This line is useless in EMR and instead watercycle has to point to the jar in your s3 environment. 
+(Whereas its a real pain to load from s3 locally as we'd need to setup the s3 drivers first and then
+add this driver). 
+
+What this means is that you'll need to download that jar and place it in the `jars` folder of the 
+bucket that you're using for EMR. Only then will `watercycle submit spark` work properly. 
+
 ### To Be or NAT to Be...
 
 Access to `athena` queries requires public internet access and because, today, EMR serverless
