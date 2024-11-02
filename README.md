@@ -82,6 +82,26 @@ db.drop_table('people')
 
 ## Reading and Writing with Spark
 
+### To Be or NAT to Be...
+
+Access to `athena` queries requires public internet access and because, today, EMR serverless
+doesn't allow public subnets to be associated with your applications that means setting up a 
+NAT gateway. NAT gateways however are expensive - you pay for the 24/7 and pay for them every
+time data goes through 'em. So for our purposes a NAT gateway doesn't make sense. 
+
+This doesn't mean we're totally toasted though as we can still access `glue` and get a lot of the
+work done. Specifically we can still pull directly from S3 (just not with an `athena` query)
+and can write partitions back and check their schema's against the glue catalog. 
+
+The two things we cannot do is run `athena` queries and update the registered partitions. But the
+former is really not a requirement and the latter can be done later from a batch job or a workstation. 
+
+So in the code you'll find that those two functions require `public_internet_access=True` to work
+and I've set the default of that input to `False` for now. Hopefully in the future EMR serverless 
+will allow public subnets and thus the free internet gateways that come with them. 
+
+### Reading and Writing when `public_internet_access=True`
+
 Here's an example of how you can read and write data with Spark:
 
 ```python
@@ -89,6 +109,7 @@ import os
 
 import haven.spark as db 
 from pyspark.sql import SparkSession
+
 
 if __name__ == "__main__":
     os.environ['AWS_REGION'] = 'us-east-1'
@@ -109,11 +130,14 @@ if __name__ == "__main__":
             and date in ('2021-01-01', '2021-01-02')
     """
     df = db.read_data(
-        sql, spark, qrb
+        sql, spark, qrb, public_internet_access=True
     )
 
-    db.write_data(
+    db.write_partitions(
         df, 'spark_test_1', ["date"]
+    )
+    db.register_partitions(
+        'spark_test_1', public_internet_access=True
     )
 
     spark.stop()
