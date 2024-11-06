@@ -41,7 +41,7 @@ def configure(spark_session, region="", hadoop_version="3.3.4"):
         .config("spark.jars.packages", f"org.apache.hadoop:hadoop-aws:{hadoop_version}")
         # prevents writing _SUCCESS files
         .config("spark.hadoop.mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
-        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.profile.ProfileCredentialsProvider")
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.DefaultAWSCredentialsProviderChain")
         .config("spark.hadoop.fs.s3a.endpoint", "s3.amazonaws.com")
         # this line only effects local development. For EMR watercycle adds
         # this to the submit config
